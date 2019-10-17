@@ -1,19 +1,54 @@
+/**
+ * This code was based on the Google Quickstart sample for node.js
+ * @see https://developers.google.com/sheets/api/quickstart/nodejs
+ */
+
 const fs = require('fs');
+const path = require('path');
 const readline = require('readline');
 const {google} = require('googleapis');
 
-// If modifying these scopes, delete token.json.
+/**
+ * If modifying these scopes, delete token.json.
+ * 
+ * The file token.json stores the user's access and refresh tokens, and is
+ * created automatically when the authorization flow completes for the first
+ * time.
+ * 
+ * The first time you run the sample, it will prompt you to authorize access:
+ * Browse to the provided URL in your web browser.
+ * 
+ * If you are not already logged into your Google account,
+ * you will be prompted to log in. If you are logged into multiple
+ * Google accounts, you will be asked to select one account to use for the
+ * authorization.
+ * 
+ * Click the Accept button.
+ * Copy the code you're given, paste it into the command-line prompt,
+ * and press Enter.
+ */
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
 const TOKEN_PATH = 'token.json';
 
-// Load client secrets from a local file.
+/**
+ * Load client secrets from a local file.
+ * 
+ * To obtain this file go to:
+ * @see https://console.developers.google.com/cloud-resource-manager
+ * 1 - Create Project
+ * 2 - Go to Project Settings
+ * 3 - Go to APIs & Services
+ * 3.1 - Create Credentials - OAuth client ID
+ * 3.2 - Download the file from the in row menu at right of the page and save it
+ *       with the name credentials.json and replace on project.
+ * 4 - Go to Dashboards
+ * 4.1 - Enable APIS AND SERVICES
+ * 4.1.1 - Choose Google sheets
+ */
 fs.readFile('credentials.json', (err, content) => {
   if (err) return console.log('Error loading client secret file:', err);
   // Authorize a client with credentials, then call the Google Sheets API.
-  authorize(JSON.parse(content), listMajors);
+  authorize(JSON.parse(content), DownloadSheetData);
 });
 
 /**
@@ -46,12 +81,12 @@ function getNewToken(oAuth2Client, callback) {
     access_type: 'offline',
     scope: SCOPES,
   });
-  console.log('Authorize this app by visiting this url:', authUrl);
+  console.log('Authorize this app by visiting this url: \n', authUrl);
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
   });
-  rl.question('Enter the code from that page here: ', (code) => {
+  rl.question('Paste the code from that page here: ', (code) => {
     rl.close();
     oAuth2Client.getToken(code, (err, token) => {
       if (err) return console.error('Error while trying to retrieve access token', err);
@@ -66,25 +101,26 @@ function getNewToken(oAuth2Client, callback) {
   });
 }
 
+
+
+
+
 /**
- * Prints the names and majors of students in a sample spreadsheet:
- * @see https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+ * Download Sheet Data
+ * @see https://docs.google.com/spreadsheets/d/1bVqPYL526C26BLIxrO52V_yBaVJwo4PnKKQUFUDGR6o/edit
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
-function listMajors(auth) {
+function DownloadSheetData(auth) {
   const sheets = google.sheets({version: 'v4', auth});
   sheets.spreadsheets.values.get({
-    spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
-    range: 'Class Data!A2:E',
+    spreadsheetId: '1bVqPYL526C26BLIxrO52V_yBaVJwo4PnKKQUFUDGR6o',
+    range: 'translations!A:Z', //Range must be a parameter from config.json
   }, (err, res) => {
     if (err) return console.log('The API returned an error: ' + err);
     const rows = res.data.values;
     if (rows.length) {
-      console.log('Name, Major:');
-      // Print columns A and E, which correspond to indices 0 and 4.
-      rows.map((row) => {
-        console.log(`${row[0]}, ${row[4]}`);
-      });
+      console.log('Found data.');
+
     } else {
       console.log('No data found.');
     }
