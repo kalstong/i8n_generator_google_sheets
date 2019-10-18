@@ -102,8 +102,8 @@ function getNewToken(oAuth2Client, callback) {
 }
 
 
-
-
+const resourcesDir = path.join(__dirname, 'resources');
+const localesFilePath = path.join(resourcesDir, 'locales.json');
 
 /**
  * Download Sheet Data
@@ -114,15 +114,63 @@ function DownloadSheetData(auth) {
   const sheets = google.sheets({version: 'v4', auth});
   sheets.spreadsheets.values.get({
     spreadsheetId: '1bVqPYL526C26BLIxrO52V_yBaVJwo4PnKKQUFUDGR6o',
-    range: 'translations!A:Z', //Range must be a parameter from config.json
+    range: 'translations!A:Z', //Range can be from min to max, because the API will retrieve only the columns with data.
   }, (err, res) => {
     if (err) return console.log('The API returned an error: ' + err);
     const rows = res.data.values;
     if (rows.length) {
-      console.log('Found data.');
-
+      GenerateFiles(rows);
     } else {
       console.log('No data found.');
     }
+  });
+}
+
+/**
+ * Generate locales.json and the respective translation file per locale
+ * Save it to resources directory
+ */
+function GenerateFiles(rows) {
+  console.log(`There is ${rows[0].length -1} languages and ${rows.length - 2} translations per language.`);
+
+  var translations = {};
+  var localeNames = {};
+  
+  // The next 3 blocks of code are too confusing....needs a refactor
+  rows[0].forEach((name, index) => {
+    translations[name] = {};
+    localeNames[rows[0][index]] = rows[1][index];
+  });
+
+  rows[0].forEach((name) => {
+    translations[name]["_comment"] = ["              #####  ########  #######  ########               ","             ##    ##    ##    ##     ## ##     ##             ","             ##          ##    ##     ## ##     ##             ","              ######     ##    ##     ## ########              ","                   ##    ##    ##     ## ##                    ","             ##    ##    ##    ##     ## ##                    ","              ######     ##     #######  ##                    "," THIS FILE IS AUTO-GENERATED ANY MODIFICATION WILL BE OVERRIDED"];
+  });
+
+  
+  rows.slice(2).forEach(row => {
+    const key = row.pop();
+    if (key) {
+      row.forEach((element, index) => {
+        translations[rows[0][index]][key] = element;
+      });
+    }
+  });
+
+  /**
+   * Create resources directory
+   * 
+   * A file locales.json will be written into that directory. This file
+   * contains the locales and respective names.
+   * 
+   * Also save a file per locale with the respective translations
+   */
+  if (!fs.existsSync(resourcesDir)){
+    fs.mkdirSync(resourcesDir);
+  }
+
+  fs.writeFileSync(localesFilePath, JSON.stringify(localeNames, null, 2), 'utf-8');
+  
+  Object.entries(translations).forEach(([key, value]) => {
+    fs.writeFileSync(path.join(resourcesDir, key + '.json'), JSON.stringify(value, null, 2), 'utf-8');
   });
 }
