@@ -59,3 +59,22 @@ If the token.json exists and are valid the the generation will be automatic.
 
 The translations are based on this sample [Google Sheet document](https://docs.google.com/spreadsheets/d/1bVqPYL526C26BLIxrO52V_yBaVJwo4PnKKQUFUDGR6o).
 This document have a couple of languages and some placeholders with the respective translations.
+
+
+## How to setup for my own Google Sheet?
+
+There is a credentials.json that stores the API access to the Google Sheet App.
+
+In order to create that App and that file please follow the next steps.
+
+Go to : https://console.developers.google.com/cloud-resource-manager
+ * 1 - Create Project
+ * 2 - Go to Project Settings
+ * 3 - Go to APIs & Services
+ * 3.1 - Create Credentials - OAuth client ID
+ * 3.2 - Download the file from the in row menu at right of the page and save it with the name credentials.json and replace on project.
+ * 4 - Go to Dashboards
+ * 4.1 - Enable APIS AND SERVICES
+ * 4.1.1 - Choose Google sheets
+
+
