@@ -1,6 +1,6 @@
 {
   "name": "i8n_generator_google_sheets",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Generate language resource files from Google Sheets",
   "main": "generate.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "author": "Ricardo Silva",
   "license": "MIT",
   "devDependencies": {
-    "jest": "^24.9.0"
+    "jest": "^25.1.0"
   },
   "dependencies": {
     "googleapis": "^44.0.0"
